@@ -1,0 +1,8 @@
+{
+  "name":  {
+    "message": "EnglishLLM"
+  },
+  "description":  {
+    "message": "EnglishLLM - расширение для генерации ответов на вопросы"
+  }
+}
