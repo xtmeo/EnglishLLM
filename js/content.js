@@ -7,14 +7,51 @@ chrome.runtime.onMessage.addListener(
 
 function getTextWithLineBreaks(element) {
     let result = '';
-    for (const node of element.childNodes) {
-        if (node.nodeType === Node.TEXT_NODE) {
-            result += node.textContent + '\n';
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            result += getTextWithLineBreaks(node) + '\n';
-        }
+    let children_separator = '\n';
+    const element_tag = (element.tagName || '').toLowerCase();
+    if (element.nodeType === Node.TEXT_NODE) {
+        result = element.textContent + '\n';
+        if (element.textContent === 'Choose...') return '';
     }
-    return result.trim();
+    //console.log(element_tag);
+
+    if (element_tag === 'select') {
+        result = '[[ ';
+        children_separator = '; '
+    } else if (element_tag === 'option') {
+        if (element.textContent == 'Choose...') return '';
+        return `${element.value} - "${element.textContent}"`;
+    } else if (element_tag === 'label') {
+        result = '';
+    }
+
+    for (const node of element.childNodes) {
+        result += getTextWithLineBreaks(node) + children_separator;
+    }
+
+    if (element_tag === 'select') {
+        result += ' ]]\n\n';
+    }
+    console.log(result);
+    return result;
+}
+
+function writeAnswers(answers, question, question_type) {
+    const element = document.querySelector(`#q${question} > div:nth-child(2)`);
+    if (question_type === 'inputfield') {
+        const inputs = element.querySelectorAll('input');
+        const filteredInputs = Array.from(inputs).filter(input => input.type !== 'submit');
+        filteredInputs.forEach((input, index) => {
+            input.value = answers[index];
+        });
+    } else if (question_type === 'select') {
+        const inputs = element.querySelectorAll('select');
+        const filteredInputs = Array.from(inputs).filter(input => input.type !== 'submit');
+        filteredInputs.forEach((input, index) => {
+            input.value = answers[index + 1];
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    }
 }
 
 // Обрабатываем входящии сообщение
@@ -26,21 +63,20 @@ function parseMessage(data) {
         if (messageData.type == 'get_content') {
             const question = messageData.question;
             const element = document.querySelector(`#q${question} > div:nth-child(2)`);
+
+            let question_type = 'inputfield';
+            if (element.querySelector('select') != null) {
+                question_type = 'select';
+            }
+
             sendPopup({
                 'type': 'send_content', 
                 'content': (element ? getTextWithLineBreaks(element) : ''),
-                'question': question
+                'question': question,
+                'question_type': question_type
             })
         } else if (messageData.type == 'send_answers') {
-            const answers = messageData.answers;
-            const question = messageData.question;
-            const element = document.querySelector(`#q${question} > div:nth-child(2)`);
-            const inputs = element.querySelectorAll('input'); // Находим все input-поля внутри элемента
-            // Проверяем, что количество input-полей совпадает с количеством ответов
-            //if (inputs.length !== answers.length) {}
-            inputs.forEach((input, index) => {
-                input.value = answers[index]; // Заменяем значение input-поля на элемент из списка answers
-            });
+            writeAnswers(messageData.answers, messageData.question, messageData.question_type);
         }
     }
 }
