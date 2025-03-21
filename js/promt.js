@@ -97,8 +97,15 @@ Ash
 3) There is no numbering in the answer, as the number is not part of the answer.
 `
 
+const promt_radio = `
+Внимательно прочитай условие и реши задание. 
+Формат вывода должен содержать исключительно одно число - номер [[OPTION]].
+Это должно быть число, а не буква. Варианты ответа номеруются с 0. (т.е. 0, 1, 2, т.д.)
+`
+
 function getPromt(type) {
     if (type === 'inputfield') return promt_inputfield;
     if (type === 'select') return promt_select;
+    if (type === 'radio') return promt_radio;
     return '';
 }

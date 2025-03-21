@@ -6,6 +6,9 @@ chrome.runtime.onMessage.addListener(
 );
 
 function getTextWithLineBreaks(element) {
+    if (element === null) {
+        return '';
+    }
     let result = '';
     let children_separator = '\n';
     const element_tag = (element.tagName || '').toLowerCase();
@@ -23,6 +26,8 @@ function getTextWithLineBreaks(element) {
         return `${element.value} - "${element.textContent}"`;
     } else if (element_tag === 'label') {
         result = '';
+    } else if (element_tag === 'input' && element.type === 'radio') {
+        result = '[[OPTION]]';
     }
 
     for (const node of element.childNodes) {
@@ -32,7 +37,7 @@ function getTextWithLineBreaks(element) {
     if (element_tag === 'select') {
         result += ' ]]\n\n';
     }
-    console.log(result);
+    //console.log(result);
     return result;
 }
 
@@ -51,22 +56,30 @@ function writeAnswers(answers, question, question_type) {
             input.value = answers[index];
             input.dispatchEvent(new Event('change', { bubbles: true }));
         });
+    } else if (question_type === 'radio') {
+        const inputs = element.querySelectorAll('input[type="radio"]');
+        const answer = answers[0];
+        inputs[answer].checked = true;
+        inputs[answer].click();
     }
 }
 
 // Обрабатываем входящии сообщение
 function parseMessage(data) {
-    console.log(data);
+    //console.log(data);
     if (data.data.type) {
         var messageData = data.data;
-        console.log(messageData.type);
+        //console.log(messageData.type);
         if (messageData.type == 'get_content') {
             const question = messageData.question;
             const element = document.querySelector(`#q${question} > div:nth-child(2)`);
 
             let question_type = 'inputfield';
-            if (element.querySelector('select') != null) {
+            if (element && element.querySelector('select') != null) {
                 question_type = 'select';
+            }
+            if (element && element.querySelector('input[type="radio"]') != null) {
+                question_type = 'radio';
             }
 
             sendPopup({
@@ -84,7 +97,7 @@ function parseMessage(data) {
 // Отправить сообщение в popup.js
 function sendPopup(data) {
     chrome.runtime.sendMessage({"data": data}, function (response) {
-        console.log(response);
+        //console.log(response);
     });
 }
 

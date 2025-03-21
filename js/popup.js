@@ -35,7 +35,7 @@ function sendContent(data) {
 async function neuroGenerate(text, promt) {
     const API_KEY = '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';
     const MODEL_ID = 'deepseek/deepseek-chat:free';
-    //MODEL_ID = 'deepseek/deepseek-r1:free';
+    //const MODEL_ID = 'deepseek/deepseek-r1:free';
     const basePrompt = `${promt}\n\n==========================================\n\n${text}`;
 
     try {
@@ -73,6 +73,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 async function processContent(text, question, question_type) {
+    console.log(`Вопрос: ${question}`);
     if (text == '') {
         if (question == 1) {
             popupContent.textContent = `Не найдено`;
@@ -89,8 +90,8 @@ async function processContent(text, question, question_type) {
     //inputfield
     const result = await neuroGenerate(text, getPromt(question_type));
     //popupContent.textContent = result;
-
     //return;
+
     const result_list = result.split('\n').map(item => item.trim()).filter(item => item !== '');
     sendContent({'type': 'send_answers', 'answers': result_list, 'question': question, 'question_type': question_type});
     sendContent({'type': 'get_content', 'question': question + 1});
