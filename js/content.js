@@ -40,7 +40,7 @@ function writeAnswers(answers, question, question_type) {
     const element = document.querySelector(`#q${question} > div:nth-child(2)`);
     if (question_type === 'inputfield') {
         const inputs = element.querySelectorAll('input');
-        const filteredInputs = Array.from(inputs).filter(input => input.type !== 'submit');
+        const filteredInputs = Array.from(inputs).filter(input => (input.type !== 'submit' && input.type !== 'hidden'));
         filteredInputs.forEach((input, index) => {
             input.value = answers[index];
         });
@@ -48,7 +48,7 @@ function writeAnswers(answers, question, question_type) {
         const inputs = element.querySelectorAll('select');
         const filteredInputs = Array.from(inputs).filter(input => input.type !== 'submit');
         filteredInputs.forEach((input, index) => {
-            input.value = answers[index + 1];
+            input.value = answers[index];
             input.dispatchEvent(new Event('change', { bubbles: true }));
         });
     }
