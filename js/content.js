@@ -86,7 +86,8 @@ function parseMessage(data) {
                 'type': 'send_content', 
                 'content': (element ? getTextWithLineBreaks(element) : ''),
                 'question': question,
-                'question_type': question_type
+                'question_type': question_type,
+                'is_question_answered': messageData.is_question_answered
             })
         } else if (messageData.type == 'send_answers') {
             writeAnswers(messageData.answers, messageData.question, messageData.question_type);

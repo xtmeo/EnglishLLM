@@ -13,7 +13,7 @@ function parseMessage(data) {
         var messageData = data.data;
         console.log(messageData.type);
         if (messageData.type == 'send_content') {
-            processContent(messageData.content, messageData.question, messageData.question_type);
+            processContent(messageData.content, messageData.question, messageData.question_type, messageData.is_question_answered);
         }
     }
 }
@@ -68,14 +68,18 @@ window.addEventListener('DOMContentLoaded', function() {
     generateButton?.addEventListener('click', async function() {
         generateButton.style.display = 'none';
         popupContent.textContent = 'Поиск...';
-        sendContent({'type': 'get_content', 'question': 1});
+        sendContent({'type': 'get_content', 'question': 1, 'is_question_answered': false});
     });
 });
 
-async function processContent(text, question, question_type) {
+async function processContent(text, question, question_type, is_question_answered) {
     console.log(`Вопрос: ${question}`);
     if (text == '') {
-        if (question == 1) {
+        if (question <= 10) {
+            sendContent({'type': 'get_content', 'question': question + 1, 'is_question_answered': is_question_answered});
+            return;
+        }
+        if (!is_question_answered) {
             popupContent.textContent = `Не найдено`;
             return;
         }
@@ -94,5 +98,5 @@ async function processContent(text, question, question_type) {
 
     const result_list = result.split('\n').map(item => item.trim()).filter(item => item !== '');
     sendContent({'type': 'send_answers', 'answers': result_list, 'question': question, 'question_type': question_type});
-    sendContent({'type': 'get_content', 'question': question + 1});
+    sendContent({'type': 'get_content', 'question': question + 1, 'is_question_answered': true});
 }
