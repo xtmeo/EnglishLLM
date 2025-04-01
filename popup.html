@@ -7,7 +7,21 @@
     <script src="./js/promt.js"></script>
     <script src="./js/popup.js"></script>
 </head>
+
 <body>
+
+    <div class="regularText">
+        Выберите модель:
+    </div>
+    <div class="controls">
+        <select id="modelSelect">
+            <option value="deepseek/deepseek-chat:free">deepseek/deepseek-chat:free</option>
+            <option value="deepseek/deepseek-r1:free">deepseek/deepseek-r1:free</option>
+            <option value="custom">другое</option>
+        </select>
+        <input type="text" id="customModel" class="hidden" placeholder="Введите название модели">
+    </div>
+
 <div>
     <button id="generateButton">Сгенерировать</button>
 </div>

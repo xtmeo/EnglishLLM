@@ -4,6 +4,32 @@
     height: 50px;
     margin: 5px;
 }
+
 #popupContent {
     clear: both;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+#generateButton {
+    font-size: 14px;
+}
+
+.regularText {
+    clear: both;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.controls {
+    margin-bottom: 10px;
+}
+
+#customModel {
+    margin-top: 5px;
+    width: 180px;
+}
+
+.hidden {
+    display: none;
 }

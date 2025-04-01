@@ -32,10 +32,8 @@ function sendContent(data) {
 }
 
 // Функция для нейрогенерации
-async function neuroGenerate(text, promt) {
-    const API_KEY = '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';
-    const MODEL_ID = 'deepseek/deepseek-chat:free';
-    //const MODEL_ID = 'deepseek/deepseek-r1:free';
+async function neuroGenerate(text, promt, MODEL_ID) {
+    const API_KEY = 'sk-or-v1-f824' + 'de8d8ddffea0f7ceafe' + '7e9fc9e6eb2b1bce' + 'fc497c6e74c7c4459f690267b';
     const basePrompt = `${promt}\n\n==========================================\n\n${text}`;
 
     try {
@@ -50,12 +48,11 @@ async function neuroGenerate(text, promt) {
                 messages: [{ role: 'user', content: basePrompt }]
             })
         });
-
         const data = await response.json();
-        return data.choices[0].message.content;
+        return data;
     } catch (error) {
         console.error('Error:', error);
-        return 'Ошибка генерации';
+        return null;
     }
 }
 
@@ -64,11 +61,42 @@ async function neuroGenerate(text, promt) {
 window.addEventListener('DOMContentLoaded', function() {
     const generateButton = document.getElementById('generateButton');
     const popupContent = document.getElementById('popupContent');
+    const modelSelect = document.getElementById('modelSelect');
+    const customModel = document.getElementById('customModel');
 
     generateButton?.addEventListener('click', async function() {
         generateButton.style.display = 'none';
+        popupContent.style.color = "#000000";
         popupContent.textContent = 'Поиск...';
         sendContent({'type': 'get_content', 'question': 1, 'is_question_answered': false});
+    });
+
+    chrome.storage.local.get(['selectedModel'], function(result) {
+        const savedModel = result.selectedModel || 'deepseek/deepseek-chat:free';
+        if ((savedModel !== 'deepseek/deepseek-chat:free') && (savedModel !== 'deepseek/deepseek-r1:free')) {
+            modelSelect.value = 'custom';
+            customModel.value = savedModel;
+            customModel.classList.remove('hidden');
+        } else {
+            modelSelect.value = savedModel;
+            customModel.classList.add('hidden');
+        }
+    });
+
+    modelSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customModel.classList.remove('hidden');
+            customModel.focus();
+            if (customModel.value !== '')
+                chrome.storage.local.set({ selectedModel: customModel.value });
+        } else {
+            customModel.classList.add('hidden');
+            chrome.storage.local.set({ selectedModel: this.value });
+        }
+    });
+
+    customModel.addEventListener('input', function() {
+        chrome.storage.local.set({ selectedModel: this.value });
     });
 });
 
@@ -80,7 +108,9 @@ async function processContent(text, question, question_type, is_question_answere
             return;
         }
         if (!is_question_answered) {
+            generateButton.style.display = '';
             popupContent.textContent = `Не найдено`;
+            popupContent.style.color = "#cc0000";
             return;
         }
         generateButton.style.display = '';
@@ -92,9 +122,23 @@ async function processContent(text, question, question_type, is_question_answere
     //popupContent.textContent = text;
     //return;
     //inputfield
-    const result = await neuroGenerate(text, getPromt(question_type));
-    //popupContent.textContent = result;
-    //return;
+    const current_model = (await chrome.storage.local.get(['selectedModel'])).selectedModel;
+    const json_result = await neuroGenerate(text, getPromt(question_type), current_model);
+    if (json_result === null) {
+        generateButton.style.display = '';
+        popupContent.textContent = 'Ошибка генерации';
+        popupContent.style.color = "#cc0000";
+        return;
+    }
+    let result = '';
+    try {
+        result = json_result.choices[0].message.content;
+    } catch {
+        generateButton.style.display = '';
+        popupContent.textContent = json_result.error.message;
+        popupContent.style.color = "#cc0000";
+        return;
+    }
 
     const result_list = result.split('\n').map(item => item.trim()).filter(item => item !== '');
     sendContent({'type': 'send_answers', 'answers': result_list, 'question': question, 'question_type': question_type});
