@@ -32,8 +32,11 @@ function sendContent(data) {
 }
 
 // Функция для нейрогенерации
-async function neuroGenerate(text, promt, MODEL_ID) {
-    const API_KEY = 'sk-or-v1-f824' + 'de8d8ddffea0f7ceafe' + '7e9fc9e6eb2b1bce' + 'fc497c6e74c7c4459f690267b';
+async function neuroGenerate(text, promt, MODEL_ID, current_api_key) {
+    let API_KEY = 'sk-or-v1-f824' + 'de8d8ddffea0f7ceafe' + '7e9fc9e6eb2b1bce' + 'fc497c6e74c7c4459f690267b';
+    if (current_api_key !== '') {
+        API_KEY = current_api_key;
+    }
     const basePrompt = `${promt}\n\n==========================================\n\n${text}`;
 
     try {
@@ -45,7 +48,15 @@ async function neuroGenerate(text, promt, MODEL_ID) {
             },
             body: JSON.stringify({
                 model: MODEL_ID,
-                messages: [{ role: 'user', content: basePrompt }]
+                messages: [
+                    { 
+                        role: 'user', 
+                        content: [{
+                          type: 'text',
+                          text: basePrompt,
+                        }]
+                    }
+                ]
             })
         });
         const data = await response.json();
@@ -63,6 +74,8 @@ window.addEventListener('DOMContentLoaded', function() {
     const popupContent = document.getElementById('popupContent');
     const modelSelect = document.getElementById('modelSelect');
     const customModel = document.getElementById('customModel');
+    const apiKeyInput = document.getElementById('inputKey');
+    const toggleButton = document.getElementById('toggleKeyVisibility');
 
     generateButton?.addEventListener('click', async function() {
         generateButton.style.display = 'none';
@@ -70,6 +83,8 @@ window.addEventListener('DOMContentLoaded', function() {
         popupContent.textContent = 'Поиск...';
         sendContent({'type': 'get_content', 'question': 1, 'is_question_answered': false});
     });
+
+    // Model pick
 
     chrome.storage.local.get(['selectedModel'], function(result) {
         const savedModel = result.selectedModel || 'deepseek/deepseek-chat:free';
@@ -80,6 +95,7 @@ window.addEventListener('DOMContentLoaded', function() {
         } else {
             modelSelect.value = savedModel;
             customModel.classList.add('hidden');
+            chrome.storage.local.set({ selectedModel: savedModel });
         }
     });
 
@@ -98,6 +114,23 @@ window.addEventListener('DOMContentLoaded', function() {
     customModel.addEventListener('input', function() {
         chrome.storage.local.set({ selectedModel: this.value });
     });
+
+    // API key input
+
+    chrome.storage.local.get(['openRouterAPIKey'], function(result) {
+        const savedAPIKey = result.openRouterAPIKey;
+        apiKeyInput.value = savedAPIKey || '';
+    });
+
+    apiKeyInput.addEventListener('input', function() {
+        chrome.storage.local.set({ openRouterAPIKey: this.value });
+    });
+
+    toggleButton?.addEventListener('click', async function() {
+        const isPassword = apiKeyInput.type === 'password';
+        apiKeyInput.type = isPassword ? 'text' : 'password';
+        //toggleButton.textContent = isPassword ? '👁️🗨️' : '👁️';
+    });
 });
 
 async function processContent(text, question, question_type, is_question_answered) {
@@ -114,7 +147,8 @@ async function processContent(text, question, question_type, is_question_answere
             return;
         }
         generateButton.style.display = '';
-        popupContent.textContent = '';
+        popupContent.textContent = `Готово!`;
+        popupContent.style.color = "#008000";
         return;
     }
     popupContent.textContent = 'Генерация...';
@@ -123,7 +157,8 @@ async function processContent(text, question, question_type, is_question_answere
     //return;
     //inputfield
     const current_model = (await chrome.storage.local.get(['selectedModel'])).selectedModel;
-    const json_result = await neuroGenerate(text, getPromt(question_type), current_model);
+    const current_api_key = (await chrome.storage.local.get(['openRouterAPIKey'])).openRouterAPIKey;
+    const json_result = await neuroGenerate(text, getPromt(question_type), current_model, current_api_key);
     if (json_result === null) {
         generateButton.style.display = '';
         popupContent.textContent = 'Ошибка генерации';

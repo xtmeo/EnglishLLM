@@ -10,16 +10,28 @@
 
 <body>
 
-    <div class="regularText">
-        Выберите модель:
+    <div class="controls">
+        <div class="regularText">
+            Введите API ключ от <a href="https://openrouter.ai/">openrouter.ai</a>
+        </div>
+        <div class="inputKeyContainer">
+            <input type="password" id="inputKey" placeholder="Использовать встроенный">
+            <button id="toggleKeyVisibility" class="eyeButton">👁️</button>
+        </div>
     </div>
     <div class="controls">
+        <div class="regularText">
+            Выберите модель:
+        </div>
         <select id="modelSelect">
             <option value="deepseek/deepseek-chat:free">deepseek/deepseek-chat:free</option>
             <option value="deepseek/deepseek-r1:free">deepseek/deepseek-r1:free</option>
             <option value="custom">другое</option>
         </select>
         <input type="text" id="customModel" class="hidden" placeholder="Введите название модели">
+        <div class="regularText">
+            <a href="https://openrouter.ai/models">Список моделей</a>
+        </div>
     </div>
 
 <div>
