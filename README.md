@@ -14,7 +14,7 @@
 
 По умолчанию используется DeepSeek V3. Со встроенным API ключом можно использовать [любую бесплатную модель отсюда](https://openrouter.ai/models?max_price=0&order=top-weekly). Для этого выберите модель, нажмите на иконку "Copy model id", откройте расширение EnglishLLM, под текстом "Выберите модель:" выберите "другое" и вставьте ранее скопированный идентификатор модели.
 
-Если хотите использовать платные модели, то зарегистрируйтесь на сайте [https://openrouter.ai/](openrouter.ai), получите API ключ ([https://openrouter.ai/settings/keys](openrouter.ai/settings/keys)), откройте расширение EnglishLLM, вставьте ключ в поле под текстом "Введите API ключ". [https://openrouter.ai/models?order=top-weekly](Список всех доступных моделей можно посмотреть тут).
+Если хотите использовать платные модели, то зарегистрируйтесь на сайте [openrouter.ai](https://openrouter.ai/), получите API ключ ([openrouter.ai/settings/keys](https://openrouter.ai/settings/keys)), откройте расширение EnglishLLM, вставьте ключ в поле под текстом "Введите API ключ". [Список всех доступных моделей можно посмотреть тут](https://openrouter.ai/models?order=top-weekly).
 
 # Инструкции
 
