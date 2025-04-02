@@ -4,6 +4,10 @@
 
 Это расширение умеет решать задания на сайте lms.mipt.ru
 
+<img src="https://github.com/user-attachments/assets/cc67de75-64fa-4547-8bd6-36b33dbe2aee" width="300" />
+
+Пример задания:
+
 <img src="https://github.com/user-attachments/assets/7db8ac9c-151c-4cf9-9d90-e587af731c6b" width="600" />
 
 Проверяйте, какие ответы сгенерировались, перед отправкой! Вероятность неправильной генерации значительно выше, если задание сконструировано как таблица
