@@ -34,7 +34,7 @@ function sendContent(data) {
 // Функция для нейрогенерации
 async function neuroGenerate(text, promt, MODEL_ID, current_api_key) {
     let API_KEY = 'sk-or-v1-f824' + 'de8d8ddffea0f7ceafe' + '7e9fc9e6eb2b1bce' + 'fc497c6e74c7c4459f690267b';
-    if (current_api_key !== '' && current_api_key !== null) {
+    if (current_api_key !== '' && current_api_key != null) {
         API_KEY = current_api_key;
     }
     const basePrompt = `${promt}\n\n==========================================\n\n${text}`;
@@ -158,6 +158,7 @@ async function processContent(text, question, question_type, is_question_answere
     //inputfield
     const current_model = (await chrome.storage.local.get(['selectedModel'])).selectedModel;
     const current_api_key = (await chrome.storage.local.get(['openRouterAPIKey'])).openRouterAPIKey;
+    
     const json_result = await neuroGenerate(text, getPromt(question_type), current_model, current_api_key);
     if (json_result === null) {
         generateButton.style.display = '';
