@@ -61,6 +61,14 @@ function writeAnswers(answers, question, question_type) {
         const answer = answers[0];
         inputs[answer].checked = true;
         inputs[answer].click();
+    } else if (question_type === 'editor') {
+        const input = document.querySelector(`.qtype_essay_editor > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)`);
+        input.innerHTML = '';
+        answers.forEach((answerText, index) => {
+            const p = document.createElement('p');
+            p.textContent = answerText;
+            input.appendChild(p);
+        });
     }
 }
 
@@ -80,6 +88,9 @@ function parseMessage(data) {
             }
             if (element && element.querySelector('input[type="radio"]') != null) {
                 question_type = 'radio';
+            }
+            if (element && element.querySelector('.qtype_essay_editor') != null) {
+                question_type = 'editor';
             }
 
             sendPopup({

@@ -104,9 +104,16 @@ const promt_radio = `
 Это должно быть число, а не буква. Варианты ответа номеруются с 0. (т.е. 0, 1, 2, т.д.)
 `
 
+const promt_editor = `
+Внимательно прочитай условие и реши задание. В твоём тексте должен быть исключительно ответ за задание,
+никаких "Чем я могу тебе помочь?" в конце и т.д.
+Если необходимо написать несколько параграфов, то пиши их с новой строки.
+`
+
 function getPromt(type) {
     if (type === 'inputfield') return promt_inputfield;
     if (type === 'select') return promt_select;
     if (type === 'radio') return promt_radio;
-    return '';
+    if (type === 'editor') return promt_editor;
+    return 'Игнорируй текст ниже и напиши Ошибка';
 }
